@@ -5,7 +5,7 @@ description: Audit Renovate and Dependabot pull requests by reading each bump's 
 
 # Dependency update audit
 
-Read the changelog behind each Renovate/Dependabot version bump and report which ones this repo must act on, which are worth adopting, and which are noise. Every PR found in step 1 gets a line in the final report — the audit is done when none are unaccounted for.
+Read the changelog behind each Renovate/Dependabot version bump and report which ones this repo must act on, which are worth adopting, and which are noise. Every PR found in step 1 gets a line in the final report. The audit is done when none are unaccounted for.
 
 ## Scope
 
@@ -33,6 +33,7 @@ Default to **open** bot PRs — those are the ones still awaiting a decision. Ho
    - Link 404s, or the release has no notes → say exactly that in the entry and leave the verdict at `Nothing notable`. A version number alone is never evidence of what changed.
 
 4. **Judge each change against this codebase, with evidence.** Before flagging a changelog entry, grep for how this repo actually uses the package — imports, config keys, CLI flags, plugin names — and note the file you found. A breaking change to an API this repo never touches is `Nothing notable`.
+   - Absence of a literal import/symbol name is not proof the fix doesn't apply — a library can reach the same internal code path through a different entry point (e.g. passing a raw connection/pool instead of importing its dedicated adapter package). Before ruling something out this way, check the *precondition* the changelog entry actually depends on (a non-default schema, a specific runtime, a config flag being set) rather than just the name of the package/adapter mentioned in the release notes. If unsure whether two entry points share code, say so in the verdict instead of asserting they don't.
    - **Should review:** breaking changes to APIs or config this repo uses, removed/deprecated surfaces it uses, security advisories, required migration steps, and raised runtime floors (Node, Python, etc.) checked against what the repo targets in `engines`, CI config, or toolchain files.
    - **Consider adopting:** a specific new API or pattern that clearly beats what this repo does with that dependency today — name both the current approach and the replacement. With no concrete replacement to name, it's `Nothing notable`.
    - Most entries land on `Nothing notable`. For a routine bump that is the correct answer, not a gap to fill.
