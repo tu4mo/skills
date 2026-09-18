@@ -5,11 +5,7 @@ description: Audit Renovate and Dependabot pull requests by reading each bump's 
 
 # Dependency update audit
 
-Read the changelog behind each Renovate/Dependabot version bump and report which ones this repo must act on, which are worth adopting, and which are noise. Every PR found in step 1 gets a line in the final report. The audit is done when none are unaccounted for.
-
-## Scope
-
-Default to **open** bot PRs — those are the ones still awaiting a decision. Honor an explicit window instead when the user gives one ("last month", "since we upgraded X", "all merged this year", a specific PR number or list). When the request is ambiguous, run on open PRs and close the report by noting that merged PRs were excluded and can be added on request.
+Read the changelog behind each Renovate/Dependabot version bump and report which ones this repo must act on, which are worth adopting, and which are noise. Audit all open bot PRs in the repo — those are the ones still awaiting a decision. Every PR found in step 1 gets a line in the final report. The audit is done when none are unaccounted for.
 
 ## Workflow
 
@@ -20,7 +16,7 @@ Default to **open** bot PRs — those are the ones still awaiting a decision. Ho
    gh pr list --search "author:app/dependabot is:open" --json number,title,url,body,state,createdAt,mergedAt --limit 200
    ```
 
-   For a history window, swap `is:open` for `is:merged merged:>=2026-08-01` (or `is:closed`) per Scope. If `gh` errors — no GitHub remote, not authenticated — report that and stop; there is no fallback source for this data.
+   If the user gives an explicit window ("last month", "since we upgraded X", "all merged this year", a specific PR number or list), swap `is:open` for `is:merged merged:>=2026-08-01` (or `is:closed`) accordingly. If `gh` errors — no GitHub remote, not authenticated — report that and stop; there is no fallback source for this data.
 
 2. **Parse each PR** into: package name, ecosystem (npm/pip/docker/etc.), old version → new version, and bump level (major/minor/patch). The title usually states it ("Update dependency foo to v3"); comparing the two version numbers confirms it. Two shapes need extra care:
    - **Grouped PRs** — "Update all non-major dependencies", "Lock file maintenance", Dependabot groups — bump several packages at once. Audit each package inside separately, then report the group as one PR entry listing its packages.
